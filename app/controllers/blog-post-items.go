@@ -2,6 +2,7 @@ package controllers
 
 import (
     "github.com/musale/go-blog/app/models"
+    "github.com/revel/revel"
     "encoding/json"
 )
 
@@ -17,7 +18,7 @@ func (c BlogPostItem) parseBlogPost() (models.BlogPost, error) {
 
 
 func (c BlogPostItem) Add() revel.Result {
-    if blogitem, err := c.parseBidItem(); err != nil {
+    if blogitem, err := c.parseBlogPost(); err != nil {
         return c.RenderText("Unable to parse the BlogPost from JSON.")
     } else {
         // Validate the model
@@ -30,7 +31,7 @@ func (c BlogPostItem) Add() revel.Result {
                 return c.RenderText(
                     "Error inserting record into database!")
             } else {
-                return c.RenderJson(biditem)
+                return c.RenderJson(blogitem)
             }
         }
     }
@@ -44,4 +45,38 @@ func (c BlogPostItem) Get(id int64) revel.Result {
         return c.RenderText("Error. BlogPost probably doesn't exist.")
     }
     return c.RenderJson(blogitem)
+}
+
+func (c BlogPostItem) List() revel.Result {
+    lastId := parseIntOrDefault(c.Params.Get("lid"), -1)
+    limit := parseUintOrDefault(c.Params.Get("limit"), uint64(25))
+    blogitems, err := c.Txn.Select(models.BlogPost{},
+        `SELECT * FROM BlogPost WHERE Id > ? LIMIT ?`, lastId, limit)
+    if err != nil {
+        return c.RenderText(
+            "Error trying to get records from DB.")
+    }
+    return c.RenderJson(blogitems)
+}
+
+func (c BlogPostItem) Update(id int64) revel.Result {
+    blogitems, err := c.parseBlogPost()
+    if err != nil {
+        return c.RenderText("Unable to parse the BlogPostItem from JSON.")
+    }
+    // Ensure the Id is set.
+    blogitems.Id = id
+    success, err := c.Txn.Update(&blogitems)
+    if err != nil || success == 0 {
+        return c.RenderText("Unable to update bid item.")
+    }
+    return c.RenderText("Updated %v", id)
+}
+
+func (c BlogPostItem) Delete(id int64) revel.Result {
+    success, err := c.Txn.Delete(&models.BlogPost{Id: id})
+    if err != nil || success == 0 {
+        return c.RenderText("Failed to remove BlogPostItem")
+    }
+    return c.RenderText("Deleted %v", id)
 }
