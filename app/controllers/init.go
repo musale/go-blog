@@ -1,8 +1,17 @@
 package controllers
 
-import "github.com/revel/revel"
+import (
+    "github.com/musale/go-blog/app/models"
+    "github.com/revel/revel"
+    "github.com/coopernurse/gorp"
+    "database/sql"
+    _ "github.com/go-sql-driver/mysql"
+    "fmt"
+    "strings"
+)
 
 func init() {
+    revel.OnAppStart(InitDb)
 	revel.InterceptMethod((*GorpController).Begin, revel.BEFORE)
 	revel.InterceptMethod((*GorpController).Commit, revel.AFTER)
 	revel.InterceptMethod((*GorpController).Rollback, revel.FINALLY)
@@ -48,9 +57,15 @@ var InitDb func() = func() {
 			Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
 	}
 	// Defines the table for use by GORP
-	// This is a function we will create soon.
-	defineBidItemTable(Dbm)
+	defineBlogPostTable(Dbm)
 	if err := Dbm.CreateTablesIfNotExists(); err != nil {
 		revel.ERROR.Fatal(err)
 	}
+}
+
+func defineBlogPostTable(dbm *gorp.DbMap){
+    // set "id" as primary key and autoincrement
+    t := dbm.AddTable(models.BlogPost{}).SetKeys(true, "id")
+    // e.g. VARCHAR(25)
+    t.ColMap("name").SetMaxSize(25)
 }
