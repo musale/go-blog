@@ -5,11 +5,11 @@
 module:testrunner
 
 GET     /                                       App.Index
-GET     /post/:id                               BlogPost.Get
-POST    /post                                   BlogPost.Add
-PUT     /post/:id                               BlogPost.Update
-DELETE  /post/:id                               BlogPost.Delete
-GET     /posts                                  BlogPost.List
+GET     /post/:id                               BlogPostItem.Get
+POST    /post                                   BlogPostItem.Add
+PUT     /post/:id                               BlogPostItem.Update
+DELETE  /post/:id                               BlogPostItem.Delete
+GET     /posts                                  BlogPostItem.List
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
