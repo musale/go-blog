@@ -67,5 +67,5 @@ func defineBlogPostTable(dbm *gorp.DbMap){
     // set "id" as primary key and autoincrement
     t := dbm.AddTable(models.BlogPost{}).SetKeys(true, "id")
     // e.g. VARCHAR(25)
-    t.ColMap("name").SetMaxSize(25)
+    t.ColMap("title").SetMaxSize(25)
 }
