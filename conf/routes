@@ -5,8 +5,10 @@
 module:testrunner
 
 GET     /                                       App.Index
-GET     /post/:id                               BlogPostItem.Get
+
 POST    /post                                   BlogPostItem.Add
+GET     /new                                    BlogPostItem.NewPost
+GET     /post/:id                               BlogPostItem.Get
 PUT     /post/:id                               BlogPostItem.Update
 DELETE  /post/:id                               BlogPostItem.Delete
 GET     /posts                                  BlogPostItem.List
