@@ -1,17 +1,19 @@
 package controllers
 
 import (
-    "github.com/musale/go-blog/app/models"
-    "github.com/revel/revel"
-    "github.com/coopernurse/gorp"
-    "database/sql"
-    _ "github.com/go-sql-driver/mysql"
-    "fmt"
-    "strings"
+	"database/sql"
+	"fmt"
+	"strings"
+
+	"github.com/coopernurse/gorp"
+	// import mysql connector
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/musale/go-blog/app/models"
+	"github.com/revel/revel"
 )
 
 func init() {
-    revel.OnAppStart(InitDb)
+	revel.OnAppStart(InitDb)
 	revel.InterceptMethod((*GorpController).Begin, revel.BEFORE)
 	revel.InterceptMethod((*GorpController).Commit, revel.AFTER)
 	revel.InterceptMethod((*GorpController).Rollback, revel.FINALLY)
@@ -39,14 +41,15 @@ func getConnectionString() string {
 	dbargs := getParamString("dbargs", " ")
 
 	if strings.Trim(dbargs, " ") != "" {
-		dbargs = "?" + dbargs
+		dbargs = "?parseTime=true?" + dbargs
 	} else {
-		dbargs = ""
+		dbargs = "?parseTime=true"
 	}
 	return fmt.Sprintf("%s:%s@%s([%s]:%s)/%s%s",
 		user, pass, protocol, host, port, dbname, dbargs)
 }
 
+// InitDb to CreateTablesIfNotExists
 var InitDb func() = func() {
 	connectionString := getConnectionString()
 	if db, err := sql.Open("mysql", connectionString); err != nil {
@@ -63,9 +66,9 @@ var InitDb func() = func() {
 	}
 }
 
-func defineBlogPostTable(dbm *gorp.DbMap){
-    // set "id" as primary key and autoincrement
-    t := dbm.AddTable(models.BlogPost{}).SetKeys(true, "id")
-    // e.g. VARCHAR(25)
-    t.ColMap("title").SetMaxSize(25)
+func defineBlogPostTable(dbm *gorp.DbMap) {
+	// set "id" as primary key and autoincrement
+	t := dbm.AddTable(models.BlogPost{}).SetKeys(true, "id")
+	// e.g. VARCHAR(25)
+	t.ColMap("title").SetMaxSize(25)
 }
