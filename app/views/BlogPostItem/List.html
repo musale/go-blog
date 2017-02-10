@@ -1,0 +1,24 @@
+{{set . "title" "Blog Posts"}}
+{{template "header.html" .}}
+
+<div class="container">
+    <div class="row">
+        {{range .blogitems}}
+            <div class="panel panel-success">
+                <div class="panel-heading">{{.Title}}</div>
+                <div class="panel-body">{{.Body}}</div>
+                <div class="panel-footer">
+                    <p>
+
+                        {{.Category}}
+                        {{.DateOfPublishing}}
+                        {{.Author}}
+                    </p>
+                </div>
+            </div>
+
+        {{end}}
+    </div>
+</div>
+
+{{template "footer.html" .}}
